@@ -1,20 +1,19 @@
 package com.nickskelton.wifidelity.view
 
 import android.Manifest
-import android.arch.lifecycle.Observer
-import android.databinding.DataBindingUtil
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.RecyclerView
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.databinding.ActivityChooseNetworkBinding
 import com.nickskelton.wifidelity.view.adapter.BlockListItem
 import com.nickskelton.wifidelity.view.adapter.SimpleBlockAdapter
 import com.tbruyelle.rxpermissions2.RxPermissions
-import org.koin.android.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import kotlinx.android.synthetic.main.activity_choose_network.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ChooseNetworkActivity : AppCompatActivity() {
 

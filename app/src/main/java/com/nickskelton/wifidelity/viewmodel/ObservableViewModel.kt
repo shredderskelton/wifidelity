@@ -1,9 +1,9 @@
 package com.nickskelton.wifidelity.viewmodel
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.databinding.Observable
-import android.databinding.PropertyChangeRegistry
+import androidx.databinding.Observable
+import androidx.databinding.PropertyChangeRegistry
+import androidx.lifecycle.AndroidViewModel
 import com.nickskelton.wifidelity.BR
 
 abstract class ObservableViewModel(app: Application) : AndroidViewModel(app), Observable {

@@ -8,8 +8,6 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.text.FirebaseVisionText
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
-import com.nickskelton.wifidelity.view.adapter.BlockListItem
-import com.nickskelton.wifidelity.wifi.WifiFinder
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.subjects.BehaviorSubject

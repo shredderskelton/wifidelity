@@ -10,7 +10,7 @@ import com.nickskelton.wifidelity.model.ImageProcessor
 import com.nickskelton.wifidelity.model.WorkflowRepository
 import com.nickskelton.wifidelity.view.ChooseNetworkViewModel
 import org.koin.android.ext.koin.androidContext
-import org.koin.android.viewmodel.experimental.builder.viewModel
+import org.koin.androidx.viewmodel.experimental.builder.viewModel
 import org.koin.dsl.module.module
 
 val apiModule = module {

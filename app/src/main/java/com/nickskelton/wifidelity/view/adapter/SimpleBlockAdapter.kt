@@ -1,9 +1,9 @@
 package com.nickskelton.wifidelity.view.adapter
 
-import android.databinding.DataBindingUtil
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.databinding.SimpleBlockListItemBinding
 
@@ -37,9 +37,9 @@ class SimpleBlockAdapter : RecyclerView.Adapter<SimpleBlockAdapter.BlockViewHold
         RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.root.setOnClickListener { _ ->
-                binding.item?.let {
-                    it.onSelected.invoke(it)
+            binding.root.setOnClickListener {
+                binding.item?.let { item ->
+                    item.onSelected.invoke(item)
                 }
             }
         }

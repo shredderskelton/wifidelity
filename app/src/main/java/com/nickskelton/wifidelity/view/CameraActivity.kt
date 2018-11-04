@@ -5,10 +5,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.model.BitmapRepository
 import com.tbruyelle.rxpermissions2.RxPermissions
