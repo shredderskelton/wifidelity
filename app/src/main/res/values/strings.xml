@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Wifidelity</string>
+    <string name="request_permission">We need permission to use the camera</string>
+    <string name="no_thanks">No thanks</string>
+    <string name="ask_wifi_permissions">Smart connect tries to match the wifi access points around you with the text in the photo to make connecting even easier.</string>
+    <string name="yes">Yes</string>
+    <string name="enable_auto_connect">Enable smart connect?</string>
+    <string name="retry">Retry</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="rhythmEigth">4dp</dimen>
+    <dimen name="rhythmQuarter">8dp</dimen>
+    <dimen name="rhythmHalf">16dp</dimen>
+    <dimen name="rhythm">24dp</dimen>
+</resources>
