@@ -1,6 +1,7 @@
 package com.nickskelton.wifidelity.view
 
 import android.Manifest
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import android.os.Bundle
@@ -10,6 +11,7 @@ import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.databinding.ActivityChooseNetworkBinding
 import com.nickskelton.wifidelity.view.adapter.BlockListItem
 import com.nickskelton.wifidelity.view.adapter.SimpleBlockAdapter
+import com.nickskelton.wifidelity.viewmodel.observeNonNull
 import com.tbruyelle.rxpermissions2.RxPermissions
 import timber.log.Timber
 import kotlinx.android.synthetic.main.activity_choose_network.*
@@ -32,31 +34,28 @@ class ChooseNetworkActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_choose_network)
         binding.setLifecycleOwner(this)
         binding.vm = chooseNetworkViewModel
-        binding.vm!!.items.observe(this, Observer<List<BlockListItem>> { adapter.updateItems(it!!) })
+
+        binding.vm!!.apply {
+            observeNonNull(items) {
+                adapter.updateItems(it)
+            }
+            observeNonNull(actionNext) {
+                startPasswordSelection()
+            }
+        }
 
         recyclerMan.adapter = adapter
         recyclerMan.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         retryButton.setOnClickListener { finish() }
 
         setTitle("Select your wifi network: ")
-//        bindView()
-//        bindViewModel()
         setupPermissions()
     }
 
-//
-//    private fun bindView() {
-//        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-//        recyclerView.adapter = adapter
-//        retryButton.setOnClickListener { finish() }
-//    }
-//
-//    private fun bindViewModel() {
-//        binding = DataBindingUtil.setContentView(this, R.layout.activity_choose_network)
-//        binding.setLifecycleOwner(this)
-//        binding.vm = chooseNetworkViewModel
-//        binding.vm!!.items.observe(this, Observer<List<BlockListItem>> { adapter.updateItems(it!!) })
-//    }
+    private fun startPasswordSelection() {
+        startActivity(Intent(this, ChoosePasswordActivity::class.java))
+    }
+
     private fun setupPermissions() {
         rxPermissions = RxPermissions(this)
         val allPermissionsGranted = requiredPermissions.all { rxPermissions.isGranted(it) }
@@ -76,21 +75,6 @@ class ChooseNetworkActivity : AppCompatActivity() {
                     }
                 }
         }
-        wifiDialog.show(fragmentManager, "")
+        wifiDialog.show(supportFragmentManager, "")
     }
-//
-////
-////        RxView.clicks(findViewById(R.id.connectButton))
-////                .compose(RxPermissions(this).ensure(Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.ACCESS_COARSE_LOCATION))
-////                .subscribe({ granted ->
-////                    if (granted)
-////                        wifiManager.scan()
-////                })
-//
-//    private fun onNewResults(result: DetectionResult?) {
-//        when (result) {
-//            is DetectionResult.Success -> adapter.updateItems(result.blocks)
-//            is DetectionResult.Failed -> Toast.makeText(this, "Error: ${result.exception.localizedMessage}", Toast.LENGTH_LONG).show()
-//        }
-//    }
 }

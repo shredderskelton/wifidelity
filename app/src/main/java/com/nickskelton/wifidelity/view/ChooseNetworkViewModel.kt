@@ -10,7 +10,10 @@ import com.nickskelton.wifidelity.model.WorkflowRepository
 import com.nickskelton.wifidelity.view.adapter.BlockListItem
 import com.nickskelton.wifidelity.viewmodel.ObservableViewModel
 import com.nickskelton.wifidelity.viewmodel.toLiveData
+import com.nickskelton.wifidelity.viewmodel.toLiveEvent
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import org.koin.core.parameter.parametersOf
 import org.koin.standalone.KoinComponent
@@ -27,6 +30,10 @@ class ChooseNetworkViewModel(
     private val imageProcessor: ImageProcessor by inject { parametersOf(bitmapRepository.bitmap!!) }
 
     private val detectionResult = imageProcessor.results
+
+    private val actionNextRelay: PublishSubject<Unit> = PublishSubject.create()
+
+    val actionNext = actionNextRelay.toLiveEvent()
 
     val loading = detectionResult.map {
         when (it) {
@@ -61,6 +68,7 @@ class ChooseNetworkViewModel(
         when (it) {
             is DetectionResult.Success -> {
                 Timber.d("Got some blocks successfully")
+                workflowRepository.results = it.blocks
                 it.blocks
             }
             else -> emptyList()
@@ -81,7 +89,7 @@ class ChooseNetworkViewModel(
     private fun onItemSelected(item: BlockListItem) {
         Timber.d("Selected ${item.foundText}")
         workflowRepository.networkName = item.foundText
-
+        actionNextRelay.onNext(Unit)
     }
 
     private fun convert(blocks: List<Pair<BitmapDrawable, String>>, withNetworks: List<String>): List<BlockListItem> =

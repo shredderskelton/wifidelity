@@ -31,6 +31,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.ChooseNetworkActivity" />
+        <activity android:name=".view.ChoosePasswordActivity" />
+        <activity android:name=".view.ConnectActivity" />
         <activity android:name=".view.TextResultsActivity" />
 
         <provider
