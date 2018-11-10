@@ -27,7 +27,6 @@ val apiModule = module {
 
 val pluginModule = module {
     single<SingleItemRepository<Bitmap>> { VolatileBitmapRepository() }
-    single<SingleItemRepository<Bitmap>> { VolatileBitmapRepository() }
     single { WorkflowRepository() }
     factory { (bitmap: Bitmap) -> ImageProcessor(bitmap) }
 }
