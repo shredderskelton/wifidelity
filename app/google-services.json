@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "381806186319",
+    "firebase_url": "https://wifidelity-d8c47.firebaseio.com",
+    "project_id": "wifidelity-d8c47",
+    "storage_bucket": "wifidelity-d8c47.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381806186319:android:0d0c1d5e8e5dfaa1",
+        "android_client_info": {
+          "package_name": "com.nickskelton.wifidelity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "381806186319-j9021fr1a9lrle43gv0ontfndsv89o0r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nickskelton.wifidelity",
+            "certificate_hash": "d41e371a3f668255110777fb59ce271013c2ee45"
+          }
+        },
+        {
+          "client_id": "381806186319-56fut6a8vrd51cpp6spgqpsrch657g0a.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "381806186319-56fut6a8vrd51cpp6spgqpsrch657g0a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlgiFp8OwIMHC8kEoUKaqAkxNj6nup5HM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "381806186319-56fut6a8vrd51cpp6spgqpsrch657g0a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381806186319:android:b4a48113a8495c46",
+        "android_client_info": {
+          "package_name": "com.nickskelton.wifidelity.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "381806186319-3q09vtmvcs32h2o12e4v2l6npok00jde.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nickskelton.wifidelity.debug",
+            "certificate_hash": "d41e371a3f668255110777fb59ce271013c2ee45"
+          }
+        },
+        {
+          "client_id": "381806186319-56fut6a8vrd51cpp6spgqpsrch657g0a.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "381806186319-56fut6a8vrd51cpp6spgqpsrch657g0a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlgiFp8OwIMHC8kEoUKaqAkxNj6nup5HM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "381806186319-56fut6a8vrd51cpp6spgqpsrch657g0a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
