@@ -4,9 +4,6 @@ import android.Manifest
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.model.SingleItemRepository
@@ -21,18 +18,15 @@ import io.fotoapparat.selector.back
 import io.reactivex.disposables.Disposable
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+import kotlinx.android.synthetic.main.activity_main.*
 
 class CameraActivity : AppCompatActivity() {
 
-    private lateinit var textView: TextView
-    private lateinit var button: Button
-    private lateinit var cameraView: io.fotoapparat.view.CameraView
     private lateinit var rxPermissions: RxPermissions
-    private lateinit var thumbView: ImageView
 
-    private var fotoapparat: Fotoapparat? = null
+    private var fotoApparat: Fotoapparat? = null
 
-    val bitmapRepository: SingleItemRepository<Bitmap> by inject()
+    private val bitmapRepository: SingleItemRepository<Bitmap> by inject()
 
     private lateinit var disposable: Disposable
 
@@ -40,11 +34,8 @@ class CameraActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        cameraView = findViewById(R.id.camera_view)
-        textView = findViewById(R.id.text)
-        button = findViewById(R.id.button)
-        thumbView = findViewById(R.id.thumbView)
-        button.setOnClickListener { takePicture() }
+        cameraButton.setOnClickListener { takePicture() }
+        galleryButton.setOnClickListener { openGallery() }
         rxPermissions = RxPermissions(this)
         disposable = rxPermissions.request(Manifest.permission.CAMERA)
             .subscribe { granted ->
@@ -57,8 +48,12 @@ class CameraActivity : AppCompatActivity() {
             }
     }
 
+    private fun openGallery() {
+        // TODO
+    }
+
     private fun initCamera() {
-        fotoapparat = Fotoapparat(
+        fotoApparat = Fotoapparat(
             context = this,
             view = cameraView,                   // view which will draw the camera preview
             scaleType = ScaleType.CenterCrop,    // (optional) we want the preview to fill the view
@@ -70,21 +65,24 @@ class CameraActivity : AppCompatActivity() {
             ),
             cameraErrorCallback = { error -> Timber.e(error) } // (optional) log fatal errors
         )
-        fotoapparat?.start()
+        fotoApparat?.start()
     }
 
     private fun takePicture() {
-        val photoResult = fotoapparat?.takePicture() ?: return
-        photoResult
-            .toBitmap()
-            .whenAvailable { bitmapPhoto ->
-                if (bitmapPhoto != null) {
-                    val rotatedBitmap = rotate(bitmapPhoto)
-                    thumbView.setImageBitmap(rotatedBitmap)
-                    val bitmapId = bitmapRepository.add(rotatedBitmap)
-                    ChooseNetworkActivity.start(this, bitmapId)
+        fotoApparat?.let { photoManager ->
+            photoManager
+                .takePicture()
+                .toBitmap()
+                .transform {
+                    rotate(it)
                 }
-            }
+                .whenAvailable { bitmap ->
+                    bitmap?.let {
+                        val bitmapId = bitmapRepository.add(it)
+                        ChooseNetworkActivity.start(this, bitmapId)
+                    }
+                }
+        }
     }
 
     private fun rotate(bitmapPhoto: BitmapPhoto): Bitmap {
@@ -98,12 +96,12 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        fotoapparat?.start()
+        fotoApparat?.start()
     }
 
     override fun onStop() {
         super.onStop()
-        fotoapparat?.stop()
+        fotoApparat?.stop()
     }
 
     override fun onDestroy() {
