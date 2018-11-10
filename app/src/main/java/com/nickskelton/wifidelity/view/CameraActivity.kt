@@ -1,7 +1,6 @@
 package com.nickskelton.wifidelity.view
 
 import android.Manifest
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
@@ -10,7 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.nickskelton.wifidelity.R
-import com.nickskelton.wifidelity.model.BitmapRepository
+import com.nickskelton.wifidelity.model.SingleItemRepository
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.fotoapparat.Fotoapparat
 import io.fotoapparat.log.fileLogger
@@ -33,7 +32,7 @@ class CameraActivity : AppCompatActivity() {
 
     private var fotoapparat: Fotoapparat? = null
 
-    val bitmapRepository: BitmapRepository by inject()
+    val bitmapRepository: SingleItemRepository<Bitmap> by inject()
 
     private lateinit var disposable: Disposable
 
@@ -82,8 +81,8 @@ class CameraActivity : AppCompatActivity() {
                 if (bitmapPhoto != null) {
                     val rotatedBitmap = rotate(bitmapPhoto)
                     thumbView.setImageBitmap(rotatedBitmap)
-                    bitmapRepository.bitmap = rotatedBitmap
-                    startActivity(Intent(this, ChooseNetworkActivity::class.java))
+                    val bitmapId = bitmapRepository.add(rotatedBitmap)
+                    ChooseNetworkActivity.start(this, bitmapId)
                 }
             }
     }

@@ -33,17 +33,7 @@
         <activity android:name=".view.ChooseNetworkActivity" />
         <activity android:name=".view.ChoosePasswordActivity" />
         <activity android:name=".view.ConnectActivity" />
-        <activity android:name=".view.TextResultsActivity" />
 
-        <provider
-            android:name=".GenericFileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
     </application>
 
 </manifest>

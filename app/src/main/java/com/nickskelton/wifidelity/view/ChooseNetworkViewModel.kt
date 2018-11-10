@@ -1,18 +1,18 @@
 package com.nickskelton.wifidelity.view
 
 import android.app.Application
+import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import com.nickskelton.wifidelity.wifi.WifiFinder
-import com.nickskelton.wifidelity.model.BitmapRepository
 import com.nickskelton.wifidelity.model.DetectionResult
 import com.nickskelton.wifidelity.model.ImageProcessor
+import com.nickskelton.wifidelity.model.SingleItemRepository
 import com.nickskelton.wifidelity.model.WorkflowRepository
 import com.nickskelton.wifidelity.view.adapter.BlockListItem
 import com.nickskelton.wifidelity.viewmodel.ObservableViewModel
 import com.nickskelton.wifidelity.viewmodel.toLiveData
 import com.nickskelton.wifidelity.viewmodel.toLiveEvent
+import com.nickskelton.wifidelity.wifi.WifiFinder
 import io.reactivex.rxkotlin.Observables
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import org.koin.core.parameter.parametersOf
@@ -22,12 +22,13 @@ import timber.log.Timber
 
 class ChooseNetworkViewModel(
     app: Application,
-    private val bitmapRepository: BitmapRepository,
+    private val bitmapId: String,
+    private val bitmapRepository: SingleItemRepository<Bitmap>,
     private val workflowRepository: WorkflowRepository,
     wifiFinder: WifiFinder
 ) : ObservableViewModel(app), KoinComponent {
 
-    private val imageProcessor: ImageProcessor by inject { parametersOf(bitmapRepository.bitmap!!) }
+    private val imageProcessor: ImageProcessor by inject { parametersOf(bitmapRepository.get(bitmapId)!!) }
 
     private val detectionResult = imageProcessor.results
 
