@@ -2,6 +2,7 @@ apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
+apply plugin: "com.github.triplet.play"
 
 static def evalVersionCode() {
     def process = "git rev-list --all --count".execute()
@@ -30,7 +31,7 @@ android {
         release {
             keyAlias project.hasProperty("keyAlias") ? project["keyAlias"] : "false"
             keyPassword project.hasProperty("keyPassword") ? project["keyPassword"] : "false"
-            storeFile file(project.hasProperty("storeFile") ? project["storeFile"] : "../signing/debug/keystore.debug.jks")
+            storeFile file(project.hasProperty("storeFile") ? project["storeFile"] : "../signing/release/skelton-play-keystore.jks")
             storePassword project.hasProperty("storePassword") ? project["storePassword"] : "false"
         }
     }
@@ -52,6 +53,12 @@ android {
     dataBinding {
         enabled = true
     }
+
+    dexOptions {
+        //don't pre dex on the ci build - pointless and takes extra time
+        preDexLibraries !project.hasProperty("isCiBuild")
+        javaMaxHeapSize "12g"
+    }
 }
 
 kapt {
@@ -63,7 +70,6 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-//    implementation "androidx.core:core-ktx:1.0.0"
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"
     implementation "androidx.appcompat:appcompat:1.0.2"
 
@@ -75,8 +81,6 @@ dependencies {
     implementation "io.fotoapparat.fotoapparat:library:2.2.0"
     implementation "io.reactivex.rxjava2:rxkotlin:2.2.0"
     implementation "com.jakewharton.timber:timber:4.7.1"
-//    implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
-//    implementation "com.github.tbruyelle:rxpermissions:0.10.2"
     implementation "com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar"
     implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.0'
 
@@ -91,30 +95,16 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:2.0.0"
 
 
-
-
-
-    def lifecycle_version = "2.0.0"
-
-    // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-    // alternatively - just ViewModel
-    //implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version" // use -ktx for Kotlin
-    // alternatively - just LiveData
-    //implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
-    // alternatively - Lifecycles only (no ViewModel or LiveData). Some UI
-    //     AndroidX libraries use this lightweight import for Lifecycle
-    //implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
-
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version" // use kapt for Kotlin
-    // alternately - if using Java8, use the following instead of lifecycle-compiler
-//    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
-
-    // optional - ReactiveStreams support for LiveData
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version" // use -ktx for Kotlin
+}
 
-    // optional - Test helpers for LiveData
-//    testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
+play {
+    serviceAccountEmail="circleci@api-6937291036522144500-342094.iam.gserviceaccount.com"
+    serviceAccountCredentials=file(project.hasProperty("deployJsonFile") ? project["deployJsonFile"] : "intentionally missing")
+    track = 'internal' // Or any of 'rollout', 'beta', 'alpha' or 'internal'
+    //userFraction = 0.2 // Only necessary for 'rollout'. The default is 0.1 (10%).
 }
 
 apply plugin: "com.google.gms.google-services"
