@@ -17,6 +17,8 @@ jobs:
       - checkout
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - restore_cache:
+          key: build
       - run:
          name: Decrypting deployment key
          command: openssl aes-256-cbc -d -md sha256 -in signing/publish/play-store-deployment-encrypted.json -out signing/publish/play-store-deployment-64.json -k $KEY
@@ -30,6 +32,10 @@ jobs:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - save_cache:
+          paths:
+            - app/build
+          key: build
       - store_artifacts:
           path: app/build/reports
           destination: reports
