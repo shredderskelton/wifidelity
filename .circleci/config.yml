@@ -23,13 +23,7 @@ jobs:
       - run:
          name: Decrypting deployment key from base 64
          command: base64 --decode signing/publish/play-store-deployment-64.json > signing/publish/play-store-deployment.json
-      - run:
-          name: Decrypting release build key
-          command: openssl aes-256-cbc -d -md sha256 -out signing/release/salads-release-key-64.jks -in signing/release/salads-release-key-encrypted.jks -k $KEY
-      - run:
-          name: Decrypting release build key from base 64
-          command: base64 --decode signing/release/salads-release-key-64.jks > signing/release/salads-release-key.jks
-      - run:
+       - run:
           name: Deploy Release
           command: ./gradlew publishApkRelease -PdeployJsonFile="../signing/publish/play-store-deployment.json" -PkeyAlias="$keystore_alias" -PkeyPassword="$keystore_password" -PstoreFile="../signing/release/skelton-play-keystore.jks" -PstorePassword="keystore_password" -PisCiBuild="$CI"
       - save_cache:
