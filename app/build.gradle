@@ -101,8 +101,7 @@ dependencies {
 }
 
 play {
-    serviceAccountEmail="circleci@api-6937291036522144500-342094.iam.gserviceaccount.com"
-    serviceAccountCredentials=file(project.hasProperty("deployJsonFile") ? project["deployJsonFile"] : "intentionally missing")
+    serviceAccountCredentials=file(project.hasProperty("deployJsonFile") ? project["deployJsonFile"] : "intentionallymissing.json")
     track = 'internal' // Or any of 'rollout', 'beta', 'alpha' or 'internal'
     //userFraction = 0.2 // Only necessary for 'rollout'. The default is 0.1 (10%).
 }
