@@ -25,7 +25,7 @@ jobs:
          command: base64 --decode signing/publish/play-store-deployment-64.json > signing/publish/play-store-deployment.json
       - run:
           name: Deploy Release
-          command: ./gradlew publishApkRelease -PdeployJsonFile="../signing/publish/play-store-deployment.json" -PkeyAlias="$keystore_alias" -PkeyPassword="$keystore_password" -PstoreFile="../signing/release/skelton-play-keystore.jks" -PstorePassword="keystore_password" -PisCiBuild="$CI"
+          command: ./gradlew publishApkRelease -PdeployJsonFile="../signing/publish/play-store-deployment.json" -PkeyAlias="$keystoreAlias" -PkeyPassword="$keystorePassword" -PstoreFile="../signing/release/skelton-play-keystore.jks" -PstorePassword="$keystorePassword" -PisCiBuild="$CI"
       - save_cache:
           paths:
             - ~/.gradle
