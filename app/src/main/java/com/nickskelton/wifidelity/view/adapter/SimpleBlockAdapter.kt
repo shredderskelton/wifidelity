@@ -3,6 +3,7 @@ package com.nickskelton.wifidelity.view.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.databinding.SimpleBlockListItemBinding
@@ -11,10 +12,12 @@ class SimpleBlockAdapter : RecyclerView.Adapter<SimpleBlockAdapter.BlockViewHold
 
     private val items = mutableListOf<BlockListItem>()
 
+    @Synchronized
     fun updateItems(newItems: List<BlockListItem>) {
+        val diffResult = DiffCallback(items, newItems).let(DiffUtil::calculateDiff)
         items.clear()
         items.addAll(newItems)
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockViewHolder {
@@ -48,5 +51,20 @@ class SimpleBlockAdapter : RecyclerView.Adapter<SimpleBlockAdapter.BlockViewHold
             binding.item = item
             binding.executePendingBindings()
         }
+    }
+
+    private class DiffCallback(
+        private val old: List<BlockListItem>,
+        private val new: List<BlockListItem>
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize() = old.size
+
+        override fun getNewListSize() = new.size
+
+        override fun areItemsTheSame(oldPosition: Int, newPosition: Int) =
+            old[oldPosition].foundText == new[newPosition].foundText
+
+        override fun areContentsTheSame(oldPosition: Int, newPosition: Int) =
+            old[oldPosition] == new[newPosition]
     }
 }

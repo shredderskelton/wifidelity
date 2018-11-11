@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -51,9 +52,19 @@ class ChooseNetworkActivity : AppCompatActivity() {
         binding.vm!!.apply {
             observeNonNull(items) {
                 adapter.updateItems(it)
+                recyclerMan.scrollToPosition(0)
             }
             observeNonNull(actionNext) {
                 startPasswordSelection()
+            }
+            observeNonNull(actionShowDialog) {
+                AlertDialog.Builder(this@ChooseNetworkActivity)
+                    .setTitle("No problem")
+                    .setMessage("We'll skip the network and you can enter it manually in a moment")
+                    .setPositiveButton("Ok") { _, _ ->
+                        startPasswordSelection()
+                    }
+                    .show()
             }
         }
 

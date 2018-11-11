@@ -36,6 +36,10 @@ class ChooseNetworkViewModel(
 
     val actionNext = actionNextRelay.toLiveEvent()
 
+    private val actionShowDialogRelay: PublishSubject<Unit> = PublishSubject.create()
+
+    val actionShowDialog = actionShowDialogRelay.toLiveEvent()
+
     val loading = detectionResult.map {
         when (it) {
             is DetectionResult.Loading -> true
@@ -68,7 +72,6 @@ class ChooseNetworkViewModel(
     private val blocksObservable = detectionResult.map {
         when (it) {
             is DetectionResult.Success -> {
-                Timber.d("Got some blocks successfully")
                 workflowRepository.results = it.blocks
                 it.blocks
             }
@@ -82,10 +85,16 @@ class ChooseNetworkViewModel(
         blocksObservable, networksObservable
     )
     { blocks, networks ->
-        Timber.d("Combining ${blocks.size} blocks with ${networks.size} networks")
-        convert(blocks, networks)
+        Timber.i("Combining ${blocks.size} blocks with ${networks.size} networks")
+        val results = mutableListOf<BlockListItem>()
+        results.addAll(convert(blocks, networks))
+        results.add(BlockListItem(null, "Click here if you don't see your network?", ::onNotFound))
+        results
+    }.toLiveData()
+
+    private fun onNotFound(item: BlockListItem) {
+        actionShowDialogRelay.onNext(Unit)
     }
-        .toLiveData()
 
     private fun onItemSelected(item: BlockListItem) {
         Timber.d("Selected ${item.foundText}")
@@ -93,17 +102,17 @@ class ChooseNetworkViewModel(
         actionNextRelay.onNext(Unit)
     }
 
-    private fun convert(blocks: List<Pair<BitmapDrawable, String>>, withNetworks: List<String>): List<BlockListItem> =
-        blocks
+    private fun convert(blocks: List<Pair<BitmapDrawable, String>>, withNetworks: List<String>): List<BlockListItem> {
+        val networksSequence = withNetworks.asSequence()
+
+        return blocks
             .sortedBy { block ->
-                withNetworks
-                    .asSequence()
-                    .map {
-                        FuzzySearch.ratio(block.second, it)
-                    }.max()
+                // Highest match with networks
+                networksSequence.map { FuzzySearch.ratio(block.second, it) }.max()
             }
             .reversed()
             .map {
                 BlockListItem(it.first, it.second, ::onItemSelected)
             }
+    }
 }

@@ -24,6 +24,7 @@ class AndroidWifiFinder(
 
     override val availableNetworks: Observable<List<String>> by lazy {
         Observable.create<List<String>> { emitter ->
+            emitter.onNext(emptyList())
             ssidEmitter = emitter
             register()
         }
