@@ -42,7 +42,7 @@ val viewModelModule = module {
         )
     }
     viewModel<ChoosePasswordViewModel>()
-    viewModel { (net: String, pwd: String) -> ConnectViewModel(get(), get(), net, pwd) }
+    viewModel { (net: String, pwd: String) -> ConnectViewModel(get(), get(), net, pwd, get()) }
 //    factory { params -> MapPresenter(params[VIEW_PARAM]) }
 //    factory { params -> MoneyPresenter(get(), params[VIEW_PARAM]) }
 //    factory { params -> SettingsPresenter(params[VIEW_PARAM]) }

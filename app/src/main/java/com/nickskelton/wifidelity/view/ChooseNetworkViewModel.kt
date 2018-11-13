@@ -3,6 +3,9 @@ package com.nickskelton.wifidelity.view
 import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import androidx.core.content.res.ResourcesCompat
+import com.nickskelton.wifidelity.R
+import com.nickskelton.wifidelity.extensions.toBitmap
 import com.nickskelton.wifidelity.model.DetectionResult
 import com.nickskelton.wifidelity.model.ImageProcessor
 import com.nickskelton.wifidelity.model.SingleItemRepository
@@ -27,6 +30,11 @@ class ChooseNetworkViewModel(
     private val workflowRepository: WorkflowRepository,
     wifiFinder: WifiFinder
 ) : ObservableViewModel(app), KoinComponent {
+
+    private val questionMark: BitmapDrawable by lazy {
+        val drawable = ResourcesCompat.getDrawable(app.resources, R.drawable.ic_help, null)!!
+        BitmapDrawable(app.resources, drawable.toBitmap())
+    }
 
     private val imageProcessor: ImageProcessor by inject { parametersOf(bitmapRepository.get(bitmapId)!!) }
 
@@ -88,7 +96,17 @@ class ChooseNetworkViewModel(
         Timber.i("Combining ${blocks.size} blocks with ${networks.size} networks")
         val results = mutableListOf<BlockListItem>()
         results.addAll(convert(blocks, networks))
-        results.add(BlockListItem(null, "Click here if you don't see your network?", ::onNotFound))
+
+        //add one at the bottom incase they dont find anything
+        if (blocks.isNotEmpty())
+            results.add(
+                BlockListItem(
+                    questionMark,
+                    "Click here if you don't see your network?",
+                    ::onNotFound
+                )
+            )
+
         results
     }.toLiveData()
 
@@ -104,7 +122,6 @@ class ChooseNetworkViewModel(
 
     private fun convert(blocks: List<Pair<BitmapDrawable, String>>, withNetworks: List<String>): List<BlockListItem> {
         val networksSequence = withNetworks.asSequence()
-
         return blocks
             .sortedBy { block ->
                 // Highest match with networks
