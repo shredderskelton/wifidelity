@@ -5,7 +5,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
+import android.view.PixelCopy
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -14,14 +17,20 @@ import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.model.SingleItemRepository
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.fotoapparat.Fotoapparat
+import io.fotoapparat.configuration.CameraConfiguration
 import io.fotoapparat.parameter.ScaleType
+import io.fotoapparat.preview.Frame
 import io.fotoapparat.result.BitmapPhoto
+import io.fotoapparat.selector.autoFlash
 import io.fotoapparat.selector.back
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.IOException
+import android.os.HandlerThread
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
 
 class CameraActivity : AppCompatActivity() {
 
@@ -42,7 +51,7 @@ class CameraActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        cameraButton.setOnApplyWindowInsetsListener { view, windowInsets ->
+        cameraButton.setOnApplyWindowInsetsListener { _, windowInsets ->
             val bottomInset = windowInsets.systemWindowInsetBottom
             cameraButton.addBottomMargin(bottomInset)
             galleryButton.addBottomMargin(bottomInset)
@@ -82,11 +91,41 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    private var lastFrame: Frame? = null
+
+    fun screenShot() {
+        // Create a bitmap the size of the scene view.
+        val bitmap = Bitmap.createBitmap(
+            cameraView.getWidth(),
+            cameraView.getHeight(),
+            Bitmap.Config.ARGB_8888
+        )
+
+        // Create a handler thread to offload the processing of the image.
+        val handlerThread = HandlerThread("PixelCopier")
+        handlerThread.start()
+        // Make the request to copy.
+        PixelCopy.request(window, bitmap, { copyResult: Int ->
+            if (copyResult === PixelCopy.SUCCESS) {
+                snapsnotImageView.setImageBitmap(bitmap)
+                snapsnotImageView.visibility = View.VISIBLE
+            } else {
+            }
+            handlerThread.quitSafely()
+        }, Handler(handlerThread.looper))
+    }
+
     private fun initCamera() {
+        cameraView.getPreview()
         fotoApparat = Fotoapparat(
             context = this,
             view = cameraView,                   // view which will draw the camera preview
             scaleType = ScaleType.CenterCrop,    // (optional) we want the preview to fill the view
+            cameraConfiguration = CameraConfiguration(autoFlash(),
+                frameProcessor = { frame ->
+                    lastFrame = frame
+                }
+            ),
             lensPosition = back(),               // (optional) we want back camera
             cameraErrorCallback = { error -> Timber.e(error) } // (optional) log fatal errors
         )
@@ -94,6 +133,7 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun takePicture() {
+        screenShot()
         fotoApparat?.let { photoManager ->
             photoManager
                 .takePicture()
@@ -139,6 +179,6 @@ class CameraActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val RESULT_LOAD_IMAGE = 8734
+        private const val RESULT_LOAD_IMAGE = 8734
     }
 }
