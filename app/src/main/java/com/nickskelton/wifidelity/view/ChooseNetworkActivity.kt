@@ -89,16 +89,17 @@ class ChooseNetworkActivity : AppCompatActivity() {
     }
 
     private fun requestPermissions() {
-        val wifiDialog = WifiPermissionDialog()
-        wifiDialog.onContinue = {
-            rxPermissions
-                .request(*requiredPermissions)
-                .subscribe {
-                    if (it) {
-                        Timber.w("User declined permissions")
+        WifiPermissionDialog().apply {
+            onContinue = {
+                rxPermissions
+                    .request(*requiredPermissions)
+                    .subscribe {
+                        if (it) {
+                            Timber.w("User declined permissions")
+                        }
                     }
-                }
+            }
+            show(supportFragmentManager, "")
         }
-        wifiDialog.show(supportFragmentManager, "")
     }
 }
