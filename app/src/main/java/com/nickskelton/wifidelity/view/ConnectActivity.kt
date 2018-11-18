@@ -57,13 +57,13 @@ class ConnectActivity : AppCompatActivity() {
     }
 
     private fun addChip(suggestion: String) {
-        Chip(this).apply {
+        val chip = Chip(this).apply {
             text = suggestion
             setOnClickListener { view ->
                 viewModel.network = (view as Chip).text.toString()
             }
-            networkChips.addView(this)
         }
+        networkChips.addView(chip)
     }
 }
 

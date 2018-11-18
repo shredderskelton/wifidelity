@@ -1,16 +1,24 @@
 package com.nickskelton.wifidelity.view
 
 import android.Manifest
+import android.animation.Animator
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
+import android.os.Looper
 import android.provider.MediaStore
 import android.view.View
+import android.view.ViewPropertyAnimator
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.nickskelton.wifidelity.R
+import com.nickskelton.wifidelity.R.id.cameraButton
+import com.nickskelton.wifidelity.R.id.galleryButton
+import com.nickskelton.wifidelity.R.id.snapShotOverlay
 import com.nickskelton.wifidelity.model.SingleItemRepository
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.fotoapparat.Fotoapparat
@@ -24,6 +32,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.IOException
+import java.util.Collections.rotate
+import android.view.animation.AlphaAnimation
 
 class CameraActivity : AppCompatActivity() {
 
@@ -34,6 +44,10 @@ class CameraActivity : AppCompatActivity() {
     private val bitmapRepository: SingleItemRepository<Bitmap> by inject()
 
     private lateinit var disposable: Disposable
+
+    private var timeToTakeAPhoto = 3000L
+
+    private var split = 3L
 
     private fun View.addBottomMargin(bottomMargin: Int) {
         val params = layoutParams as CoordinatorLayout.LayoutParams
@@ -96,18 +110,65 @@ class CameraActivity : AppCompatActivity() {
         fotoApparat?.start()
     }
 
+    private fun disableInteractions() {
+        setInteractions(false)
+        snapShotOverlay.visible(true)
+        val animation1 = AlphaAnimation(1.0f, 0.1f)
+        animation1.duration = timeToTakeAPhoto
+        animation1.startOffset = 0
+        animation1.interpolator = android.view.animation.AccelerateInterpolator()
+        animation1.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationRepeat(p0: Animation?) {
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                snapShotOverlay.visible(false)
+            }
+
+            override fun onAnimationStart(p0: Animation?) {
+            }
+        })
+        snapShotOverlay.startAnimation(animation1)
+//
+//        snapShotOverlay.alpha = 0.5f
+//        snapShotOverlay.visible(true)
+//        snapShotOverlay.animate()
+//            .setDuration(1000)
+//            .alpha(0F)
+//            .setInterpolator(LinearInterpolator())
+//            .setAnimationStartListener { snapShotOverlay.visible(true) }
+////            .setAnimationEndListener { snapShotOverlay.visible(false) }
+//            .start()
+    }
+
+    private fun enableInteractions() {
+        setInteractions(true)
+    }
+
+    private fun setInteractions(enabled: Boolean) {
+        cameraButton.visible(enabled)
+        galleryButton.visible(enabled)
+    }
+
     private fun takePicture() {
+        split = System.currentTimeMillis()
+        disableInteractions()
         fotoApparat?.let { photoManager ->
             photoManager
                 .takePicture()
                 .toBitmap()
                 .transform {
+                    if (Looper.myLooper() == Looper.getMainLooper()) {
+                        Timber.e("Shouldn't be on the main thread")
+                    }
                     rotate(it)
                 }
                 .whenAvailable { bitmap ->
                     bitmap?.let {
                         processImage(it)
                     }
+                    enableInteractions()
+                    timeToTakeAPhoto = System.currentTimeMillis() - split
                 }
         }
     }
@@ -143,5 +204,45 @@ class CameraActivity : AppCompatActivity() {
 
     companion object {
         private val RESULT_LOAD_IMAGE = 8734
+    }
+}
+
+fun ViewPropertyAnimator.setAnimationEndListener(listener: (Animator?) -> Unit): ViewPropertyAnimator {
+    this.setListener(object : OnAnimationEndListener {
+        override fun onAnimationEnd(animator: Animator?) {
+            listener.invoke(animator)
+        }
+    })
+    return this
+}
+
+fun ViewPropertyAnimator.setAnimationStartListener(listener: (Animator?) -> Unit): ViewPropertyAnimator {
+    this.setListener(object : OnAnimationStartListener {
+        override fun onAnimationStart(animator: Animator?) {
+            listener.invoke(animator)
+        }
+    })
+    return this
+}
+
+interface OnAnimationEndListener : Animator.AnimatorListener {
+    override fun onAnimationRepeat(p0: Animator?) {
+    }
+
+    override fun onAnimationCancel(p0: Animator?) {
+    }
+
+    override fun onAnimationStart(p0: Animator?) {
+    }
+}
+
+interface OnAnimationStartListener : Animator.AnimatorListener {
+    override fun onAnimationRepeat(p0: Animator?) {
+    }
+
+    override fun onAnimationCancel(p0: Animator?) {
+    }
+
+    override fun onAnimationEnd(p0: Animator?) {
     }
 }
