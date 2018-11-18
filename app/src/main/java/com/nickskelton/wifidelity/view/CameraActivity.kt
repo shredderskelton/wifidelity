@@ -14,8 +14,10 @@ import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.model.SingleItemRepository
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.fotoapparat.Fotoapparat
+import io.fotoapparat.configuration.CameraConfiguration
 import io.fotoapparat.parameter.ScaleType
 import io.fotoapparat.result.BitmapPhoto
+import io.fotoapparat.selector.autoFlash
 import io.fotoapparat.selector.back
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
@@ -86,6 +88,7 @@ class CameraActivity : AppCompatActivity() {
         fotoApparat = Fotoapparat(
             context = this,
             view = cameraView,                   // view which will draw the camera preview
+            cameraConfiguration = CameraConfiguration(autoFlash()),
             scaleType = ScaleType.CenterCrop,    // (optional) we want the preview to fill the view
             lensPosition = back(),               // (optional) we want back camera
             cameraErrorCallback = { error -> Timber.e(error) } // (optional) log fatal errors

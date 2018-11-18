@@ -102,9 +102,10 @@ dependencies {
 
 play {
     serviceAccountCredentials=file(project.hasProperty("deployJsonFile") ? project["deployJsonFile"] : "intentionallymissing.json")
-    track = 'internal' // Or any of 'rollout', 'beta', 'alpha' or 'internal'
-    releaseStatus = "draft" //draft/completed/in progress
+    track = 'alpha' // Or any of 'rollout', 'beta', 'alpha' or 'internal'
+    releaseStatus = "completed" //draft/completed/in progress
     //userFraction = 0.2 // Only necessary for 'rollout'. The default is 0.1 (10%).
 }
 
 apply plugin: "com.google.gms.google-services"
+apply plugin: 'com.akaita.android.easylauncher'

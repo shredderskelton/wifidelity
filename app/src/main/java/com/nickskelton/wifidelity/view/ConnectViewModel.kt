@@ -42,7 +42,6 @@ class ConnectViewModel(
         ReactiveNetwork
             .observeNetworkConnectivity(app)
             .subscribeOn(Schedulers.io())
-            .filter(ConnectivityPredicate.hasState(NetworkInfo.State.CONNECTED))
             .filter(ConnectivityPredicate.hasType(ConnectivityManager.TYPE_WIFI))
             .observeOn(AndroidSchedulers.mainThread())
             .map {
