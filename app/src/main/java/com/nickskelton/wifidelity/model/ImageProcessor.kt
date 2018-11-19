@@ -8,6 +8,7 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.text.FirebaseVisionText
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
+import com.nickskelton.wifidelity.utils.PerformanceLogger
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.subjects.BehaviorSubject
@@ -19,25 +20,33 @@ class ImageProcessor(private val bitmap: Bitmap) : KoinComponent {
 
     val context: Context by inject()
 
+    private val performanceLogger = PerformanceLogger("ImageProcessing")
+
     private val detector: FirebaseVisionTextRecognizer by lazy { FirebaseVision.getInstance().onDeviceTextRecognizer }
 
     val results: BehaviorSubject<DetectionResult> = BehaviorSubject.create<DetectionResult>()
 
     private val resultsObservable: Observable<DetectionResult> = Observable.create<DetectionResult> { emitter ->
+        performanceLogger.reset()
+        performanceLogger.addSplit("Started")
         emitter.onNext(DetectionResult.Loading())
         Timber.i("Loading")
         val image = FirebaseVisionImage.fromBitmap(bitmap)
         detector.processImage(image)
             .addOnSuccessListener {
                 Timber.i("Success")
+                performanceLogger.addSplit("Success")
                 onSuccess(emitter, it)
             }
             .addOnFailureListener {
                 Timber.i("Failed")
+                performanceLogger.addSplit("Failed")
                 onFailure(emitter, it)
             }
             .addOnCompleteListener {
                 Timber.i("Completed")
+                performanceLogger.addSplit("Completed")
+                performanceLogger.dumpToLog()
                 emitter.onComplete()
             }
     }
@@ -49,6 +58,7 @@ class ImageProcessor(private val bitmap: Bitmap) : KoinComponent {
     private fun onFailure(resultsEmitter: ObservableEmitter<DetectionResult>, exception: Exception) {
         Timber.e("Failed to detect text $exception")
         resultsEmitter.onNext(DetectionResult.Failed(exception = exception))
+        resultsEmitter.onComplete()
     }
 
     private fun onSuccess(
@@ -65,11 +75,14 @@ class ImageProcessor(private val bitmap: Bitmap) : KoinComponent {
             }
         }
         Timber.e("Found results: ${newBlocks.size}")
+        performanceLogger.addSplit("Processing")
+
         val result = if (newBlocks.size == 0)
             DetectionResult.NothingFound()
         else
             DetectionResult.Success(newBlocks)
         resultsEmitter.onNext(result)
+
         resultsEmitter.onComplete()
     }
 }
