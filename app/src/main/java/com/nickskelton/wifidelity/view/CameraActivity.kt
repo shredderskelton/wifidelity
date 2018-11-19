@@ -45,9 +45,9 @@ class CameraActivity : AppCompatActivity() {
 
     private lateinit var disposable: Disposable
 
-    private var timeToTakeAPhoto = 3000L
-
     private var split = 3L
+
+    val performanceLogger = PerformanceLogger("Photo")
 
     private fun View.addBottomMargin(bottomMargin: Int) {
         val params = layoutParams as CoordinatorLayout.LayoutParams
@@ -84,19 +84,19 @@ class CameraActivity : AppCompatActivity() {
         startActivityForResult(intent, RESULT_LOAD_IMAGE)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            try {
-                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
-                processImage(bitmap)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                Toast.makeText(this, "Error retrieving photo", Toast.LENGTH_LONG).show()
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+//            try {
+//                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data.data)
+//                processImage(bitmap)
+//            } catch (e: IOException) {
+//                e.printStackTrace()
+//                Toast.makeText(this, "Error retrieving photo", Toast.LENGTH_LONG).show()
+//            }
+//        } else {
+//            super.onActivityResult(requestCode, resultCode, data)
+//        }
+//    }
 
     private fun initCamera() {
         fotoApparat = Fotoapparat(
@@ -110,49 +110,62 @@ class CameraActivity : AppCompatActivity() {
         fotoApparat?.start()
     }
 
-    private fun disableInteractions() {
+    private fun onPictureCaptureStarted() {
         setInteractions(false)
-        snapShotOverlay.visible(true)
-        val animation1 = AlphaAnimation(1.0f, 0.1f)
-        animation1.duration = timeToTakeAPhoto
-        animation1.startOffset = 0
-        animation1.interpolator = android.view.animation.AccelerateInterpolator()
-        animation1.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationRepeat(p0: Animation?) {
-            }
-
-            override fun onAnimationEnd(p0: Animation?) {
-                snapShotOverlay.visible(false)
-            }
-
-            override fun onAnimationStart(p0: Animation?) {
-            }
-        })
-        snapShotOverlay.startAnimation(animation1)
-//
-//        snapShotOverlay.alpha = 0.5f
-//        snapShotOverlay.visible(true)
-//        snapShotOverlay.animate()
-//            .setDuration(1000)
-//            .alpha(0F)
-//            .setInterpolator(LinearInterpolator())
-//            .setAnimationStartListener { snapShotOverlay.visible(true) }
-////            .setAnimationEndListener { snapShotOverlay.visible(false) }
-//            .start()
+        split = System.currentTimeMillis()
+        flashAnimation()
     }
 
-    private fun enableInteractions() {
+    private fun flashAnimation() {
+        val animation1 = AlphaAnimation(1.0f, 0.1f).apply {
+            duration = animationDuration
+            interpolator = AccelerateInterpolator()
+            setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationRepeat(p0: Animation?) {
+                }
+
+                override fun onAnimationEnd(p0: Animation?) {
+                    snapShotOverlay.visible(false)
+                }
+
+                override fun onAnimationStart(p0: Animation?) {
+                    snapShotOverlay.visible(true)
+                }
+            })
+        }
+
+        snapShotOverlay.startAnimation(animation1)
+    }
+
+    private var animationDuration: Long
+        get() {
+            return PreferenceHelper
+                .defaultPrefs(this@CameraActivity)
+                .getLong(PREF_CAPTURE_TIME, 3000L)
+        }
+        set(value) {
+            PreferenceHelper
+                .defaultPrefs(this)
+                .edit()
+                .putLong(PREF_CAPTURE_TIME, value)
+                .apply()
+        }
+
+    private fun onPictureCaptureFinished() {
         setInteractions(true)
+        animationDuration = System.currentTimeMillis() - split
     }
 
     private fun setInteractions(enabled: Boolean) {
         cameraButton.visible(enabled)
         galleryButton.visible(enabled)
+        progressBar.visible(!enabled)
     }
 
     private fun takePicture() {
-        split = System.currentTimeMillis()
-        disableInteractions()
+        performanceLogger.reset()
+        performanceLogger.addSplit("Started")
+        onPictureCaptureStarted()
         fotoApparat?.let { photoManager ->
             photoManager
                 .takePicture()
@@ -203,7 +216,8 @@ class CameraActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val RESULT_LOAD_IMAGE = 8734
+        private const val RESULT_LOAD_IMAGE = 8734
+        private const val PREF_CAPTURE_TIME = "photoCaptureMillis"
     }
 }
 
