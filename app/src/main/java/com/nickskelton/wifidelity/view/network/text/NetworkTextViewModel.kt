@@ -53,12 +53,13 @@ class NetworkTextViewModel(
                 .toMutableList<BlockListItem>()
 
             items.addAll(
-                networks.map { network ->
-                    NetworkBlockListItem(
-                        network,
-                        ::onItemSelected
-                    )
-                }
+                networks
+                    .map { network ->
+                        NetworkBlockListItem(
+                            network,
+                            ::onItemSelected
+                        )
+                    }
             )
             items.toList()
         }
