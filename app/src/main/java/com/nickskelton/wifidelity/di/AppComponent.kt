@@ -11,6 +11,8 @@ import com.nickskelton.wifidelity.view.ChoosePasswordViewModel
 import com.nickskelton.wifidelity.view.ConnectViewModel
 import com.nickskelton.wifidelity.view.network.text.NetworkTextActivity
 import com.nickskelton.wifidelity.view.network.text.NetworkTextViewModel
+import com.nickskelton.wifidelity.view.password.PasswordActivity
+import com.nickskelton.wifidelity.view.password.PasswordViewModel
 import com.nickskelton.wifidelity.wifi.AndroidWifiConnector
 import com.nickskelton.wifidelity.wifi.AndroidWifiFinder
 import com.nickskelton.wifidelity.wifi.WifiConnector
@@ -46,6 +48,7 @@ val viewModelModule = module {
 //    }
 
     viewModel<NetworkTextViewModel> { (args: NetworkTextActivity.Args) -> NetworkTextViewModel(get(), args, get()) }
+    viewModel<PasswordViewModel> { (args: PasswordActivity.Args) -> PasswordViewModel(get(), args) }
     viewModel<ChoosePasswordViewModel>()
     viewModel { (net: String, pwd: String) -> ConnectViewModel(get(), get(), net, pwd, get()) }
 //    factory { params -> MapPresenter(params[VIEW_PARAM]) }

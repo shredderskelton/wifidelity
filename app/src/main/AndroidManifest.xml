@@ -35,6 +35,7 @@
         <activity android:name=".view.CameraActivity" android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity android:name=".view.network.text.NetworkTextActivity" android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".view.password.PasswordActivity" android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".view.ChooseNetworkActivity"/>
         <activity android:name=".view.ChoosePasswordActivity"/>
         <activity android:name=".view.ConnectActivity"/>

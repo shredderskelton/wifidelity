@@ -19,7 +19,7 @@ class NetworkTextViewModel(
     wifiFinder: WifiFinder
 ) : ObservableViewModel(app), KoinComponent {
 
-    private val actionNextRelay: PublishSubject<Unit> = PublishSubject.create()
+    private val actionNextRelay: PublishSubject<String> = PublishSubject.create()
 
     val actionNext = actionNextRelay.toLiveEvent()
 
@@ -94,6 +94,6 @@ class NetworkTextViewModel(
 
     private fun onItemSelected(item: BlockListItem) {
         Timber.d("Selected ${item.titleText}")
-        actionNextRelay.onNext(Unit)
+        actionNextRelay.onNext(item.titleText)
     }
 }

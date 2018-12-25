@@ -9,17 +9,18 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.view.WifiPermissionDialog
 import com.nickskelton.wifidelity.view.adapter.SimpleBlockAdapter
+import com.nickskelton.wifidelity.view.password.PasswordActivity
 import com.nickskelton.wifidelity.viewmodel.observeNonNull
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_network.*
-import org.koin.core.parameter.parametersOf
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 import java.io.Serializable
 
 class NetworkTextActivity : AppCompatActivity() {
     companion object {
-        private const val ARG_CONFIG = "config"
+        private const val ARG_CONFIG = "netconfig"
 
         fun start(context: Context, args: Args) {
             val intent = Intent(context, NetworkTextActivity::class.java)
@@ -70,6 +71,9 @@ class NetworkTextActivity : AppCompatActivity() {
             matches.forEach {
                 Timber.d("Exact match found: $it")
             }
+        }
+        observeNonNull(actionNext) {
+            PasswordActivity.start(baseContext, PasswordActivity.Args(it, args.results))
         }
     }
 
