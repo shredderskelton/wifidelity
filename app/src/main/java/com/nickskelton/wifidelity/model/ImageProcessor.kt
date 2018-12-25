@@ -14,9 +14,10 @@ import io.reactivex.ObservableEmitter
 import io.reactivex.subjects.BehaviorSubject
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
+import se.gustavkarlsson.koptional.Optional
 import timber.log.Timber
 
-class ImageProcessor(private val bitmap: Bitmap) : KoinComponent {
+class ImageProcessor(private val bitmapOptional: Optional<Bitmap>) : KoinComponent {
 
     val context: Context by inject()
 
@@ -31,24 +32,47 @@ class ImageProcessor(private val bitmap: Bitmap) : KoinComponent {
         performanceLogger.addSplit("Started")
         emitter.onNext(DetectionResult.Loading())
         Timber.i("Loading")
-        val image = FirebaseVisionImage.fromBitmap(bitmap)
-        detector.processImage(image)
-            .addOnSuccessListener {
-                Timber.i("Success")
-                performanceLogger.addSplit("Success")
-                onSuccess(emitter, it)
-            }
-            .addOnFailureListener {
-                Timber.i("Failed")
-                performanceLogger.addSplit("Failed")
-                onFailure(emitter, it)
-            }
-            .addOnCompleteListener {
-                Timber.i("Completed")
-                performanceLogger.addSplit("Completed")
-                performanceLogger.dumpToLog()
-                emitter.onComplete()
-            }
+        if (bitmapOptional.isAbsent) {
+            emitter.onNext(DetectionResult.NothingFound())
+            emitter.onComplete()
+        } else {
+            val image = FirebaseVisionImage.fromBitmap(bitmapOptional.valueUnsafe)
+            detector.processImage(image)
+                .addOnSuccessListener {
+                    success(emitter, it)
+                }
+                .addOnFailureListener {
+                    failure(emitter, it)
+                }
+                .addOnCompleteListener {
+                    completed(emitter)
+                }
+        }
+    }
+
+    private fun completed(emitter: ObservableEmitter<DetectionResult>) {
+        Timber.i("Completed")
+        performanceLogger.addSplit("Completed")
+        performanceLogger.dumpToLog()
+        emitter.onComplete()
+    }
+
+    private fun failure(
+        emitter: ObservableEmitter<DetectionResult>,
+        it: java.lang.Exception
+    ) {
+        Timber.i("Failed")
+        performanceLogger.addSplit("Failed")
+        onFailure(emitter, it)
+    }
+
+    private fun success(
+        emitter: ObservableEmitter<DetectionResult>,
+        it: FirebaseVisionText
+    ) {
+        Timber.i("Success")
+        performanceLogger.addSplit("Success")
+        onSuccess(emitter, it)
     }
 
     init {
@@ -68,7 +92,7 @@ class ImageProcessor(private val bitmap: Bitmap) : KoinComponent {
         val newBlocks = mutableListOf<Pair<BitmapDrawable, String>>()
         for (block in it.textBlocks) {
             for (line in block.lines) {
-                val thumbnail = line.toThumbnail(bitmap)
+                val thumbnail = line.toThumbnail(bitmapOptional.valueUnsafe)
                 val thumbnailDrawable = BitmapDrawable(context.resources, thumbnail)
                 val text = line.text
                 newBlocks.add(Pair(thumbnailDrawable, text))

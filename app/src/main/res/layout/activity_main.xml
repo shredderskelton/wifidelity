@@ -10,6 +10,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+    <com.nickskelton.wifidelity.view.DetectionOverlay
+            android:id="@+id/detectionOverlayView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/cameraButton"
             android:layout_width="wrap_content"
@@ -27,18 +32,5 @@
             android:layout_gravity="end|bottom"
             app:fabSize="mini"
             android:src="@drawable/ic_crop_original"/>
-
-    <View android:id="@+id/snapShotOverlay"
-          android:visibility="gone"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:background="@color/white"/>
-
-    <ProgressBar
-            android:id="@+id/progressBar"
-            android:visibility="gone"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -17,37 +17,44 @@
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackground"
-            android:padding="@dimen/rhythmQuarter">
+            android:padding="@dimen/rhythmHalf">
 
         <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/rhythmQuarter"
-                android:adjustViewBounds="true"
-                android:scaleType="centerInside"
-                android:src="@{item.bitmapMine}"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@+id/textView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/textView"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:src="@tools:sample/avatars"/>
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@{item.drawableIconRes}"
+                tools:src="@drawable/ic_network_wifi"/>
 
         <TextView
                 android:id="@+id/textView"
                 style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:maxLines="5"
-                android:text="@{item.foundText}"
-                app:layout_constrainedWidth="true"
-                app:layout_constraintHorizontal_weight="2"
-                app:layout_constraintLeft_toRightOf="@+id/imageView"
-                app:layout_constraintRight_toRightOf="parent"
+                android:text="@{item.titleText}"
+                android:layout_marginStart="@dimen/rhythmHalf"
+                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="@tools:sample/lorem/random"/>
+                app:layout_constraintBottom_toTopOf="@+id/matchStrengthTextView"
+                tools:text="This is the text found"/>
+
+        <TextView
+                android:id="@+id/matchStrengthTextView"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{item.subtitleText}"
+                android:layout_marginStart="@dimen/rhythmHalf"
+                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="Match strength"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

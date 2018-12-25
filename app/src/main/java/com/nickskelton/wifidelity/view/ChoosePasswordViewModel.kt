@@ -3,6 +3,7 @@ package com.nickskelton.wifidelity.view
 import android.app.Application
 import com.nickskelton.wifidelity.model.WorkflowRepository
 import com.nickskelton.wifidelity.view.adapter.BlockListItem
+import com.nickskelton.wifidelity.view.adapter.TextBlockListItem
 import com.nickskelton.wifidelity.viewmodel.ObservableViewModel
 import com.nickskelton.wifidelity.viewmodel.toLiveEvent
 import io.reactivex.subjects.PublishSubject
@@ -19,11 +20,11 @@ class ChoosePasswordViewModel(
     val actionNext = actionNextRelay.toLiveEvent()
 
     val items = workflowRepository.results.map {
-        BlockListItem(it.first, it.second, ::onItemSelected)
+        TextBlockListItem( it.second,10, ::onItemSelected)
     }
 
     private fun onItemSelected(item: BlockListItem) {
-        Timber.d("Selected ${item.foundText}")
-        actionNextRelay.onNext(Pair(workflowRepository.networkName, item.foundText))
+        Timber.d("Selected ${item.titleText}")
+        actionNextRelay.onNext(Pair(workflowRepository.networkName, item.titleText))
     }
 }

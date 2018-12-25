@@ -11,21 +11,25 @@ import com.nickskelton.wifidelity.model.ImageProcessor
 import com.nickskelton.wifidelity.model.SingleItemRepository
 import com.nickskelton.wifidelity.model.WorkflowRepository
 import com.nickskelton.wifidelity.view.adapter.BlockListItem
+import com.nickskelton.wifidelity.view.adapter.TextBlockListItem
 import com.nickskelton.wifidelity.viewmodel.ObservableViewModel
 import com.nickskelton.wifidelity.viewmodel.toLiveData
 import com.nickskelton.wifidelity.viewmodel.toLiveEvent
 import com.nickskelton.wifidelity.wifi.WifiFinder
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import org.koin.core.parameter.parametersOf
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
+import se.gustavkarlsson.koptional.optionalOf
 import timber.log.Timber
 
 class ChooseNetworkViewModel(
     app: Application,
     private val bitmapId: String,
+    private val results: Array<String>,
     private val bitmapRepository: SingleItemRepository<Bitmap>,
     private val workflowRepository: WorkflowRepository,
     wifiFinder: WifiFinder
@@ -36,7 +40,9 @@ class ChooseNetworkViewModel(
         BitmapDrawable(app.resources, drawable.toBitmap())
     }
 
-    private val imageProcessor: ImageProcessor by inject { parametersOf(bitmapRepository.get(bitmapId)!!) }
+    private val imageProcessor: ImageProcessor by inject {
+        parametersOf(optionalOf(bitmapRepository.get(bitmapId)))
+    }
 
     private val detectionResult = imageProcessor.results
 
@@ -77,6 +83,10 @@ class ChooseNetworkViewModel(
         it.isNotEmpty()
     }.toLiveData()
 
+    private val defaultItems: BehaviorSubject<Array<String>> by lazy {
+        BehaviorSubject.createDefault(results)
+    }
+
     private val blocksObservable = detectionResult.map {
         when (it) {
             is DetectionResult.Success -> {
@@ -90,19 +100,48 @@ class ChooseNetworkViewModel(
     private val networksObservable = wifiFinder.availableNetworks
 
     val items = Observables.combineLatest(
-        blocksObservable, networksObservable
+        blocksObservable, networksObservable, defaultItems
     )
-    { blocks, networks ->
-        Timber.i("Combining ${blocks.size} blocks with ${networks.size} networks")
+    { blocks, networks, defaults ->
+        Timber.i("Combining ${blocks.size} blocks with ${networks.size} networks and defaults: ${defaults.size}")
         val results = mutableListOf<BlockListItem>()
+
         results.addAll(convert(blocks, networks))
+        results.addAll(convert(defaults, networks))
 
         //add one at the bottom incase they dont find anything
         if (blocks.isNotEmpty())
             results.add(
-                BlockListItem(
-                    questionMark,
+                TextBlockListItem(
                     "Click here if you don't see your network?",
+                    10,
+                    ::onNotFound
+                )
+            )
+
+        results
+    }.toLiveData()
+
+    val itemsStatic = Observables.combineLatest(
+        networksObservable, defaultItems
+    )
+    { networks, defaults ->
+        Timber.i("Combining ${networks.size} networks and defaults: ${defaults.size}")
+        val networksSequence = networks.asSequence()
+
+        defaults.firstOrNull { detectedText ->
+            (networksSequence.map { FuzzySearch.ratio(detectedText, it) }.max() ?: 0 > 80)
+        }
+
+        val results = mutableListOf<BlockListItem>()
+        results.addAll(convert(defaults, networks))
+
+        //add one at the bottom incase they dont find anything
+        if (results.isNotEmpty())
+            results.add(
+                TextBlockListItem(
+                    "Click here if you don't see your network?",
+                    10,
                     ::onNotFound
                 )
             )
@@ -115,8 +154,8 @@ class ChooseNetworkViewModel(
     }
 
     private fun onItemSelected(item: BlockListItem) {
-        Timber.d("Selected ${item.foundText}")
-        workflowRepository.networkName = item.foundText
+        Timber.d("Selected ${item.titleText}")
+        workflowRepository.networkName = item.titleText
         actionNextRelay.onNext(Unit)
     }
 
@@ -129,7 +168,25 @@ class ChooseNetworkViewModel(
             }
             .reversed()
             .map {
-                BlockListItem(it.first, it.second, ::onItemSelected)
+                TextBlockListItem(
+                    it.second,
+                    10,
+                    ::onItemSelected
+                )
             }
     }
+
+    private fun convert(blocks: Array<String>, withNetworks: List<String>): List<BlockListItem> {
+        val networksSequence = withNetworks.asSequence()
+        return blocks
+            .sortedBy { block ->
+                // Highest match with networks
+                networksSequence.map { FuzzySearch.ratio(block, it) }.max()
+            }
+            .reversed()
+            .map {
+                TextBlockListItem(  it, 10, ::onItemSelected)
+            }
+    }
+
 }

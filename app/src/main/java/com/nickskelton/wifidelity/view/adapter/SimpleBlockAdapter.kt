@@ -62,7 +62,7 @@ class SimpleBlockAdapter : RecyclerView.Adapter<SimpleBlockAdapter.BlockViewHold
         override fun getNewListSize() = new.size
 
         override fun areItemsTheSame(oldPosition: Int, newPosition: Int) =
-            old[oldPosition].foundText == new[newPosition].foundText
+            old[oldPosition].titleText == new[newPosition].titleText
 
         override fun areContentsTheSame(oldPosition: Int, newPosition: Int) =
             old[oldPosition] == new[newPosition]

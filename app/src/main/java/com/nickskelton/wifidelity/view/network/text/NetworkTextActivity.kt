@@ -1,89 +1,76 @@
-package com.nickskelton.wifidelity.view
+package com.nickskelton.wifidelity.view.network.text
 
 import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.nickskelton.wifidelity.R
-import com.nickskelton.wifidelity.databinding.ActivityChooseNetworkBinding
+import com.nickskelton.wifidelity.view.WifiPermissionDialog
 import com.nickskelton.wifidelity.view.adapter.SimpleBlockAdapter
 import com.nickskelton.wifidelity.viewmodel.observeNonNull
 import com.tbruyelle.rxpermissions2.RxPermissions
-import kotlinx.android.synthetic.main.activity_choose_network.*
+import kotlinx.android.synthetic.main.activity_network.*
+import org.koin.core.parameter.parametersOf
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.io.Serializable
 
-class ChooseNetworkActivity : AppCompatActivity() {
+class NetworkTextActivity : AppCompatActivity() {
     companion object {
         private const val ARG_CONFIG = "config"
 
         fun start(context: Context, args: Args) {
-            val intent = Intent(context, ChooseNetworkActivity::class.java)
+            val intent = Intent(context, NetworkTextActivity::class.java)
             intent.putExtra(ARG_CONFIG, args)
             context.startActivity(intent)
         }
     }
 
-    data class Args(val results: List<String>) : Serializable {}
+    data class Args(val results: List<String>) : Serializable
+
+    private val viewModel: NetworkTextViewModel by viewModel { parametersOf(args) }
 
     private val requiredPermissions =
         arrayOf(Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     private lateinit var rxPermissions: RxPermissions
-    private lateinit var binding: ActivityChooseNetworkBinding
     private val adapter = SimpleBlockAdapter()
 
     private val args by lazy {
         intent.getSerializableExtra(ARG_CONFIG) as Args
     }
 
-    private val chooseNetworkViewModel: ChooseNetworkViewModel by viewModel()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_choose_network)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_choose_network)
-        binding.setLifecycleOwner(this)
-        binding.vm = chooseNetworkViewModel
+        setContentView(R.layout.activity_network)
 
-        binding.vm!!.apply {
-            observeNonNull(items) {
-                adapter.updateItems(it)
-                recyclerMan.scrollToPosition(0)
-            }
-            observeNonNull(itemsStatic) {
-                adapter.updateItems(it)
-                recyclerMan.scrollToPosition(0)
-            }
-            observeNonNull(actionNext) {
-                startPasswordSelection()
-            }
-            observeNonNull(actionShowDialog) {
-                AlertDialog.Builder(this@ChooseNetworkActivity)
-                    .setTitle("No problem")
-                    .setMessage("We'll skip the network and you can enter it manually in a moment")
-                    .setPositiveButton("Ok") { _, _ ->
-                        startPasswordSelection()
-                    }
-                    .show()
-            }
-        }
+        recyclerView.adapter = adapter
+        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
-        recyclerMan.adapter = adapter
-        recyclerMan.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        retryButton.setOnClickListener { finish() }
+        setSupportActionBar(toolbar)
 
         title = "Select your wifi network: "
         setupPermissions()
+        viewModel.bind()
     }
 
-    private fun startPasswordSelection() {
-        startActivity(Intent(this, ChoosePasswordActivity::class.java))
+    private fun NetworkTextViewModel.bind() {
+        observeNonNull(adapterItems) {
+            adapter.updateItems(it)
+            recyclerView.scrollToPosition(0)
+        }
+        observeNonNull(exactMatchFound) {
+            //TODO
+            Timber.d("Exact match found: Show Dialog ")
+        }
+        observeNonNull(exactMatches) { matches ->
+            //TODO
+            matches.forEach {
+                Timber.d("Exact match found: $it")
+            }
+        }
     }
 
     private fun setupPermissions() {
