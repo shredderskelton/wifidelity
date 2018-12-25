@@ -15,7 +15,7 @@ class NetworkBlockListItem(
 ) : BlockListItem(
     R.drawable.ic_network_wifi,
     networkName,
-    "Network Item",
+    "Network Found",
     onSelected
 )
 
@@ -26,7 +26,7 @@ class TextBlockListItem(
 ) : BlockListItem(
     R.drawable.ic_text_format,
     foundText,
-    strength.toString(),
+    "$strength% Match",
     onSelected
 )
 

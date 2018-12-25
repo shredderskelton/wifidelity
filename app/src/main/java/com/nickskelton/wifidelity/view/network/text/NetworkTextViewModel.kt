@@ -36,15 +36,21 @@ class NetworkTextViewModel(
     private val items by lazy {
         networksObservable.map { networks ->
             val networksSequence = networks.asSequence()
-            val items = results.map { text ->
-                TextBlockListItem(
-                    text,
-                    networksSequence.map { network ->
-                        FuzzySearch.ratio(text, network)
-                    }.max() ?: 0,
-                    ::onItemSelected
-                )
-            }.toMutableList<BlockListItem>()
+            val items = results
+                .map { text ->
+                    TextBlockListItem(
+                        text,
+                        networksSequence.map { network ->
+                            FuzzySearch.ratio(text, network)
+                        }.max() ?: 0,
+                        ::onItemSelected
+                    )
+                }
+                .sortedBy {
+                    it.strength
+                }
+                .reversed()
+                .toMutableList<BlockListItem>()
 
             items.addAll(
                 networks.map { network ->
