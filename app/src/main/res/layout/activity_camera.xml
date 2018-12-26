@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <io.fotoapparat.view.CameraView
+            android:id="@+id/cameraView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    <com.nickskelton.wifidelity.view.DetectionOverlay
+            android:id="@+id/detectionOverlayView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/cameraButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/rhythmHalf"
+            app:fabSize="normal"
+            android:src="@drawable/ic_camera"
+            android:layout_gravity="center|bottom"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/galleryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/rhythmHalf"
+            android:layout_gravity="end|bottom"
+            app:fabSize="mini"
+            android:src="@drawable/ic_crop_original"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
