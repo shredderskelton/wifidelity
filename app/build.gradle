@@ -75,10 +75,10 @@ dependencies {
 
     implementation "com.google.android.material:material:1.0.0"
 
-    implementation "com.google.firebase:firebase-core:16.0.5"
-    implementation "com.google.firebase:firebase-ml-vision:18.0.1"
-    implementation "io.fotoapparat.fotoapparat:library:2.2.0"
-    implementation "io.reactivex.rxjava2:rxkotlin:2.2.0"
+    implementation "com.google.firebase:firebase-core:16.0.8"
+    implementation "com.google.firebase:firebase-ml-vision:19.0.3"
+    implementation "io.reactivex.rxjava2:rxkotlin:2.3.0"
+    implementation 'com.jakewharton.rxrelay2:rxrelay:2.1.0'
     implementation "com.jakewharton.timber:timber:4.7.1"
     implementation "com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar"
     implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.0'
@@ -92,7 +92,7 @@ dependencies {
 
     testImplementation "org.koin:koin-test:$koin_version"
     testImplementation "junit:junit:4.12"
-    testImplementation "androidx.arch.core:core-testing:2.0.0"
+    testImplementation "androidx.arch.core:core-testing:2.0.1"
 
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"

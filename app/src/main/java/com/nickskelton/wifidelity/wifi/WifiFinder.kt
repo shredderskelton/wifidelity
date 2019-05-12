@@ -5,12 +5,18 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.FlowableEmitter
 import timber.log.Timber
 
 interface WifiFinder {
-    val availableNetworks: Observable<List<String>>
+    val availableNetworks: Flowable<List<String>>
+}
+
+class DummyWifiFinder : WifiFinder {
+    override val availableNetworks: Flowable<List<String>>
+        get() = Flowable.just(listOf("test", "nowifinocry", "no need for a backend"))
 }
 
 class AndroidWifiFinder(
@@ -20,14 +26,14 @@ class AndroidWifiFinder(
 
     private var receiverWifi = WifiReceiver()
 
-    private var ssidEmitter: ObservableEmitter<List<String>>? = null
+    private var ssidEmitter: FlowableEmitter<List<String>>? = null
 
-    override val availableNetworks: Observable<List<String>> by lazy {
-        Observable.create<List<String>> { emitter ->
+    override val availableNetworks: Flowable<List<String>> by lazy {
+        Flowable.create<List<String>>({ emitter ->
             emitter.onNext(emptyList())
             ssidEmitter = emitter
             register()
-        }
+        }, BackpressureStrategy.LATEST)
     }
 
     internal inner class WifiReceiver : BroadcastReceiver() {

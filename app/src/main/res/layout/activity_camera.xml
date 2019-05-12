@@ -5,15 +5,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <io.fotoapparat.view.CameraView
-            android:id="@+id/cameraView"
+    <com.nickskelton.wifidelity.view.video.CameraSourcePreviewView
+            android:id="@+id/cameraSourcePreviewView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <com.nickskelton.wifidelity.view.DetectionOverlay
-            android:id="@+id/detectionOverlayView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+        <com.nickskelton.wifidelity.view.video.GraphicOverlayView
+                android:id="@+id/graphicOverlayView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+    </com.nickskelton.wifidelity.view.video.CameraSourcePreviewView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/cameraButton"
@@ -23,14 +29,5 @@
             app:fabSize="normal"
             android:src="@drawable/ic_camera"
             android:layout_gravity="center|bottom"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/galleryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/rhythmHalf"
-            android:layout_gravity="end|bottom"
-            app:fabSize="mini"
-            android:src="@drawable/ic_crop_original"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

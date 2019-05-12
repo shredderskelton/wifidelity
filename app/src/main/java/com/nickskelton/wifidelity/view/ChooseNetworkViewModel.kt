@@ -97,7 +97,7 @@ class ChooseNetworkViewModel(
         }
     }
 
-    private val networksObservable = wifiFinder.availableNetworks
+    private val networksObservable = wifiFinder.availableNetworks.toObservable()
 
     val items = Observables.combineLatest(
         blocksObservable, networksObservable, defaultItems

@@ -15,6 +15,7 @@ import com.nickskelton.wifidelity.view.password.PasswordActivity
 import com.nickskelton.wifidelity.view.password.PasswordViewModel
 import com.nickskelton.wifidelity.wifi.AndroidWifiConnector
 import com.nickskelton.wifidelity.wifi.AndroidWifiFinder
+import com.nickskelton.wifidelity.wifi.DummyWifiFinder
 import com.nickskelton.wifidelity.wifi.WifiConnector
 import com.nickskelton.wifidelity.wifi.WifiFinder
 import org.koin.android.ext.koin.androidContext
@@ -25,7 +26,8 @@ import se.gustavkarlsson.koptional.Optional
 
 val apiModule = module {
     factory { androidContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager }
-    single<WifiFinder> { AndroidWifiFinder(androidContext().applicationContext, get()) }
+    single<WifiFinder> { DummyWifiFinder() }
+//    single<WifiFinder> { AndroidWifiFinder(androidContext().applicationContext, get()) }
     single<WifiConnector> { AndroidWifiConnector(get()) }
 }
 

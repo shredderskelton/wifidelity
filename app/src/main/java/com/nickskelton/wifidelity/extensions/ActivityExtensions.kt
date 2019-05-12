@@ -7,7 +7,9 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 
 inline fun <reified T : AppCompatActivity> Context.start(extras: ((Intent) -> Intent)) {
@@ -28,4 +30,10 @@ fun Drawable.toBitmap(): Bitmap {
     draw(canvas)
 
     return bitmap
+}
+
+fun View.addBottomMargin(bottomMargin: Int) {
+    val params = layoutParams as CoordinatorLayout.LayoutParams
+    params.bottomMargin += bottomMargin
+    layoutParams = params
 }
