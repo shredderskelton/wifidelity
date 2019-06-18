@@ -2,11 +2,13 @@ package com.nickskelton.wifidelity.view.video
 
 import android.Manifest
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.ml.vision.text.FirebaseVisionText
 import com.nickskelton.wifidelity.R
 import com.nickskelton.wifidelity.common.CameraDirection
 import com.nickskelton.wifidelity.extensions.addBottomMargin
+import com.nickskelton.wifidelity.view.ChooseNetworkActivity
 import com.nickskelton.wifidelity.view.video.frame.processor.TextProcessor
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.disposables.CompositeDisposable
@@ -65,15 +67,16 @@ class LiveCameraActivity : AppCompatActivity(), KoinComponent {
 
     private fun startCamera() {
         cameraButton.setOnClickListener {
-            //    takePicture()
+            ChooseNetworkActivity.start(
+                this, ChooseNetworkActivity.Args(
+                    text?.textBlocks?.flatMap { block ->
+                        block.lines.map { line ->
+                            line.text
+                        }
+                    } ?: emptyList()
+                )
+            )
         }
-//        frontBackCameraButton.setOnClickListener {
-//            onCameraSwitched()
-//        }
-//
-//        if (Camera.getNumberOfCameras() == 1) {
-//            frontBackCameraButton.visibility = View.GONE
-//        }
 
         cameraSource = CameraSourceImpl(this, graphicOverlayView)
 
@@ -83,6 +86,9 @@ class LiveCameraActivity : AppCompatActivity(), KoinComponent {
 
         cameraSource.requestCameraDirection(CameraDirection.BACK)
         startCameraSource()
+        graphicOverlayView.onTextSelected = {
+            Toast.makeText(this, "Chose: $it", Toast.LENGTH_LONG).show()
+        }
     }
 
     private var text: FirebaseVisionText? = null

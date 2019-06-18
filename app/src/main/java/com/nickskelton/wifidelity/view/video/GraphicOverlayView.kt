@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.view.View
 import com.nickskelton.wifidelity.common.CameraDirection
 import com.nickskelton.wifidelity.view.video.GraphicOverlayView.Graphic
+import com.nickskelton.wifidelity.view.video.frame.graphic.DetectedTextImageGraphic
 import java.util.ArrayList
 
 /**
@@ -40,6 +41,8 @@ class GraphicOverlayView(context: Context, attrs: AttributeSet) : View(context, 
     private var facing = CameraDirection.BACK
     private val graphics = ArrayList<Graphic>()
     val cameraDirection get() = facing
+
+    var onTextSelected: ((String) -> Unit)? = null
 
     /**
      * Base class for a custom graphics object to be rendered within the graphic overlayView. Subclass
@@ -156,9 +159,20 @@ class GraphicOverlayView(context: Context, attrs: AttributeSet) : View(context, 
         }
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event?.action == MotionEvent.ACTION_UP) {
+    override fun performClick(): Boolean {
+        return super.performClick()
+    }
 
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event?.action == MotionEvent.ACTION_DOWN) {
+            graphics
+                .firstOrNull {
+                    it is DetectedTextImageGraphic && it.shouldHit(event.x, event.y)
+                }?.let {
+                    val text = (it as DetectedTextImageGraphic).text
+                    onTextSelected?.invoke(text)
+                    performClick()
+                }
             return true
         }
         return super.onTouchEvent(event)

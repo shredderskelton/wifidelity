@@ -14,6 +14,15 @@ open class DetectedTextImageGraphic(
     private val originalBitmap: Bitmap
 ) : GraphicOverlayView.Graphic(overlayView) {
 
+    fun shouldHit(x: Float, y: Float): Boolean {
+        val convertedRect = line.boundingBox?.let {
+            translateRectF(RectF(it))
+        } ?: return false
+        return convertedRect.contains(x, y)
+    }
+
+    val text: String = line.text
+
     override fun draw(canvas: Canvas) {
         line.boundingBox?.let {
             canvas.drawBitmap(originalBitmap, it, translateRectF(RectF(it)), null)
